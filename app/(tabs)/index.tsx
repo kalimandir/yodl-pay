@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { HelpCircle, Settings, Plus, Wallet, ShoppingBag } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 import { useTheme } from '../../hooks/useTheme';
 import Svg, { Path } from 'react-native-svg';
 import { HomeIcon, ScanIcon, MenuIcon } from '../../components/ui/TabBarIcons';
@@ -101,6 +102,7 @@ function ActivityRow({ type, title, timestamp, amountLocal, amountUSDT, onPress 
 
 export default function HomeScreen() {
   const { colors, gradient } = useTheme();
+  const router = useRouter();
 
   const formatBalance = (amount: number) => {
     return `$${amount.toFixed(2)}`;
@@ -161,7 +163,10 @@ export default function HomeScreen() {
                   Top Up
                 </Text>
               </Pressable>
-              <Pressable style={[styles.quickActionButton, { backgroundColor: colors.bgElevated }]}>
+              <Pressable 
+                style={[styles.quickActionButton, { backgroundColor: colors.bgElevated }]}
+                onPress={() => router.push('/(screens)/wallet')}
+              >
                 <Wallet size={18} color={colors.textPrimary} strokeWidth={1.5} />
                 <Text style={[styles.quickActionLabel, { color: colors.textPrimary }]}>
                   Wallet
