@@ -1,27 +1,66 @@
 import { Stack } from 'expo-router';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { View, StyleSheet, Platform, useWindowDimensions } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { ThemeProvider } from '../contexts/ThemeContext';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 // iPhone 14 Pro dimensions
 const PHONE_WIDTH = 393;
 const PHONE_HEIGHT = 852;
 
+// Detect if running on actual mobile device (not just small window)
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      const checkIsDesktop = () => {
+        // Check for mobile user agent OR small screen
+        const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        );
+        const isSmallScreen = window.innerWidth <= 500;
+        setIsDesktop(!isMobileUA && !isSmallScreen);
+      };
+
+      checkIsDesktop();
+      window.addEventListener('resize', checkIsDesktop);
+      return () => window.removeEventListener('resize', checkIsDesktop);
+    }
+  }, []);
+
+  return isDesktop;
+}
+
 // Inject Google Fonts for web
 function useGoogleFonts() {
   useEffect(() => {
-    if (Platform.OS === 'web') {
+    if (Platform.OS === 'web' && typeof document !== 'undefined') {
+      // Add preconnect for faster font loading
+      const preconnect = document.createElement('link');
+      preconnect.rel = 'preconnect';
+      preconnect.href = 'https://fonts.googleapis.com';
+      document.head.appendChild(preconnect);
+
+      const preconnectStatic = document.createElement('link');
+      preconnectStatic.rel = 'preconnect';
+      preconnectStatic.href = 'https://fonts.gstatic.com';
+      preconnectStatic.crossOrigin = 'anonymous';
+      document.head.appendChild(preconnectStatic);
+
+      // Load the font
       const link = document.createElement('link');
       link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap';
       link.rel = 'stylesheet';
       document.head.appendChild(link);
       
-      // Apply Inter as default font
+      // Apply Inter as default font with higher specificity
       const style = document.createElement('style');
       style.textContent = `
-        * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        html, body, #root, * {
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        }
       `;
       document.head.appendChild(style);
     }
@@ -30,10 +69,7 @@ function useGoogleFonts() {
 
 export default function RootLayout() {
   useGoogleFonts();
-  const { width } = useWindowDimensions();
-  
-  // Only show phone frame on desktop-sized screens (> 500px wide)
-  const isDesktop = Platform.OS === 'web' && width > 500;
+  const isDesktop = useIsDesktop();
   
   const appContent = (
     <ThemeProvider defaultTheme="dark">
