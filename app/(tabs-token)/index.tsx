@@ -135,7 +135,7 @@ export default function HomeScreen() {
             </Pressable>
             <Pressable 
               style={styles.navIconCircle}
-              onPress={() => router.push('/(tabs)/menu')}
+              onPress={() => router.push('/(tabs-token)/menu')}
             >
               <Settings size={20} color="#FFFFFF" strokeWidth={1.5} />
             </Pressable>
@@ -168,7 +168,7 @@ export default function HomeScreen() {
               </Pressable>
               <Pressable 
                 style={[styles.quickActionButton, { backgroundColor: colors.bgElevated }]}
-                onPress={() => router.push('/(screens)/wallet')}
+                onPress={() => router.push('/(tabs-token)/wallet')}
               >
                 <Wallet size={18} color={colors.textPrimary} strokeWidth={1.5} />
                 <Text style={[styles.quickActionLabel, { color: colors.textPrimary }]}>
